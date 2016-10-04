@@ -20,18 +20,31 @@ public class AStar {
         this.addInOpenList(startPosition);
     }
 
+    public boolean checkStateInList(State stateTo, ArrayList<State> list){
+        boolean result = false;
+        for (State stateOn :
+                list) {
+            if (stateOn.equals(stateTo)) result = true;
+        }
+        return result;
+    }
     public ArrayList<State> findNeighbors(State state){
         ArrayList<State> result = new ArrayList<>();
         ArrayList<Integer> possibleStep = state.findPossibleStep();
         for (int i :
                 possibleStep) {
-            result.add(new State(Main.move(i,state.currentState),state.getG()+1,state));
+            State tempState = new State(Main.move(i,state.currentState),state.getG()+1,state);
+            if (!checkStateInList(tempState, this.closeList))   result.add(tempState);
         }
         return result;
     }
 
     public void putOnOpenList(ArrayList<State> states){
-
+        for (State state :
+                states) {
+            if (!checkStateInList(state, this.openList)) this.openList.add(state);
+          //  else if (state.checkLenght()) state.changeParent();
+        }
     }
 
     public void fromOpenToCloseList(State state){
@@ -146,9 +159,21 @@ public class AStar {
             this.parent = parent;
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            return super.equals(obj);
+        public boolean equals(State obj) {
+            //return this.currentState.equals(obj.currentState);
+            int y = 0;
+            int x = 0;
+            for (int[] i :
+                    currentState) {
+                for (int j :
+                        i) {
+                    if (j != obj.currentState[y][x]) return false;
+                    x++;
+                }
+                x=0;
+                y++;
+            }
+            return true;
         }
 
         public ArrayList<Integer> findPossibleStep(){
@@ -183,7 +208,7 @@ public class AStar {
                     result.add(this.currentState[yZeroElement][xZeroElement-1]);
                 }
                 else {
-                    result.add(this.currentState[yZeroElement+1][xZeroElement]);
+                    result.add(this.currentState[yZeroElement-1][xZeroElement]);
                     result.add(this.currentState[yZeroElement][xZeroElement+1]);
                     result.add(this.currentState[yZeroElement][xZeroElement-1]);
                 }
