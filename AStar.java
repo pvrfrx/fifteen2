@@ -6,6 +6,7 @@ public class AStar {
     private ArrayList<State> openList = new ArrayList<>();
     private ArrayList<State> closeList = new ArrayList<>();
     private State startPosition;
+    private State currentPosition;
 
     public State getStartPosition() {
         return this.startPosition;
@@ -15,9 +16,11 @@ public class AStar {
         this.openList.add(state);
     }
 
-    public AStar(State startPosition){
-        this.startPosition = startPosition;
-        this.addInOpenList(startPosition);
+    public AStar(State position){
+        this.startPosition = position;
+        this.currentPosition = position;
+        this.addInOpenList(position);
+
     }
 
     public boolean checkStateInList(State stateTo, ArrayList<State> list){
@@ -28,7 +31,7 @@ public class AStar {
         }
         return result;
     }
-    public ArrayList<State> findNeighbors(State state){
+    public ArrayList<State> findNeighbors(State state) throws NullPointerException{
         ArrayList<State> result = new ArrayList<>();
         ArrayList<Integer> possibleStep = state.findPossibleStep();
         for (int i :
@@ -80,19 +83,38 @@ public class AStar {
         State result = new State();
         for (State state :
                 this.openList) {
-            if (state.getF() < min) {
-                result = state;
-                min = state.getF();
+            if (state.parent == null && startPosition.equals(currentPosition)){
+                return startPosition;
+            }
+            else if (state.parent.equals(this.currentPosition)){
+                if (state.getF() < min) {
+                    result = state;
+                    min = state.getF();
+                }
             }
         }
         if (min == Integer.MAX_VALUE) return null;
-        else return result;
+        else {
+            this.setCurrentPosition(result);
+            return result;
+        }
+    }
+
+    public void setCurrentPosition(State currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public void printCurrentPosition(){
+        System.out.println();
+        System.out.println("!!!Это текущая позиция!!!");
+        this.currentPosition.printState();
+        System.out.println();
     }
 
     static public class State {
         private int[][] currentState;
-        private int g = 0; //расстояние от начальной вершины до текущей
-        private int h = Integer.MAX_VALUE/2; //эвристическое предположение о расстоянии от текущей вершины, до терминальной
+        private int g; //расстояние от начальной вершины до текущей
+        private int h; //эвристическое предположение о расстоянии от текущей вершины, до терминальной
        // private int f; //вес вершины
         private State parent;
         public State(){
@@ -103,14 +125,13 @@ public class AStar {
             this.setG(g);
             this.setH(findH(currentState));
             this.setParent(null);
-        //    this.setF();
         }
+
         public State(int[][] currentState, int g, State parent){
             this.currentState = currentState.clone();
             this.setG(g);
             this.setParent(parent);
             this.setH(findH(currentState));
-        //    this.setF();
         }
 
         public int findH(int[][] currentState){
@@ -138,10 +159,6 @@ public class AStar {
         public int getH() {
             return h;
         }
-
-      /*  public void setF() {
-            this.f = this.g + this.h;
-        }*/
 
         public void setG(int g) {
             this.g = g;
@@ -176,7 +193,7 @@ public class AStar {
             return true;
         }
 
-        public ArrayList<Integer> findPossibleStep(){
+        public ArrayList<Integer> findPossibleStep() throws NullPointerException{
             ArrayList<Integer> result = new ArrayList<>();
             int[] yxZeroElement = Main.findXYElement(0, this.currentState);
             int yZeroElement = yxZeroElement[0];
@@ -232,6 +249,10 @@ public class AStar {
                 }
             }
             return result;
+        }
+
+        public void printState(){
+            Main.draw(this.currentState);
         }
     }
 }
