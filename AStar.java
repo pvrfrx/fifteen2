@@ -7,6 +7,7 @@ public class AStar {
     private ArrayList<State> closeList = new ArrayList<>();
     private State startPosition;
     private State currentPosition;
+    private boolean win = false;
 
     public State getStartPosition() {
         return this.startPosition;
@@ -37,17 +38,28 @@ public class AStar {
         for (int i :
                 possibleStep) {
             State tempState = new State(Main.move(i,state.currentState),state.getG()+1,state);
-            if (!checkStateInList(tempState, this.closeList))   result.add(tempState);
+            if (tempState.getH()==0) {
+                win=true;
+                result.add(tempState);
+                return result;
+            }
+            else if (!checkStateInList(tempState, this.closeList))   result.add(tempState);
         }
         return result;
     }
 
-    public void putOnOpenList(ArrayList<State> states){
-        for (State state :
-                states) {
+    public void putOnOpenList(State state) throws NullPointerException{
+
             if (!checkStateInList(state, this.openList)) this.openList.add(state);
-          //  else if (state.checkLenght()) state.changeParent();
-        }
+            //Если клетка уже в открытом списке, то проверяем, не дешевле ли будет путь через эту клетку.
+            // Для сравнения используем стоимость G. Более низкая стоимость G указывает на то, что путь будет дешевле.
+            // Эсли это так, то меняем родителя клетки на текущую клетку и пересчитываем для нее стоимости G и F.
+            // Если вы сортируете открытый список по стоимости F, то вам надо отсортировать свесь список в соответствии с изменениями.
+            else if (state.getG()>(this.currentPosition.getG()+1)){
+                state.setParent(this.currentPosition);
+                System.out.println("йохохуу"); //if (state.checkLength()) state.changeParent();
+                //throw new NullPointerException();
+            }
     }
 
     public void fromOpenToCloseList(State state){
@@ -83,15 +95,15 @@ public class AStar {
         State result = new State();
         for (State state :
                 this.openList) {
-            if (state.parent == null && startPosition.equals(currentPosition)){
+        /*    if (state.parent == null && startPosition.equals(currentPosition)){
                 return startPosition;
             }
-            else if (state.parent.equals(this.currentPosition)){
+            else if (state.parent.equals(this.currentPosition)){*/
                 if (state.getF() < min) {
                     result = state;
                     min = state.getF();
                 }
-            }
+           // }
         }
         if (min == Integer.MAX_VALUE) return null;
         else {
@@ -109,6 +121,16 @@ public class AStar {
         System.out.println("!!!Это текущая позиция!!!");
         this.currentPosition.printState();
         System.out.println();
+    }
+
+    public boolean win(){
+        if (win == true) return true;
+        if (currentPosition.getH() == 0) return true;
+        return false;
+    }
+
+    public boolean lose(){
+        return openList.isEmpty();
     }
 
     static public class State {
@@ -253,6 +275,10 @@ public class AStar {
 
         public void printState(){
             Main.draw(this.currentState);
+        }
+
+        public boolean checkLength(){
+            return true;
         }
     }
 }

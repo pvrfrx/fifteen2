@@ -136,17 +136,36 @@ public class Main {
  */
     static void init() {
         int k = 1;
-        for(int y = 0; y < d; y++) //row - y
-        {
-            for(int x = 0; x < d; x++ ) // column - x
+        if (d==2){
+            board[0][0] = 2;
+            board[1][0] = 1;
+            board[0][1] = 3;
+            board[1][1] = 0;
+        }
+      /*  else if (d==3){
+            board[0][0] = 0;
+            board[1][0] = 1;
+            board[2][0] = 7;
+            board[0][1] = 2;
+            board[1][1] = 4;
+            board[2][1] = 6;
+            board[0][2] = 3;
+            board[1][2] = 8;
+            board[2][2] = 5;
+        }*/
+        else {
+            for(int y = 0; y < d; y++) //row - y
             {
-                board[y][x]=d*d-k;
-                if ((d*d)%2 == 0 && y == (d-1))
+                for(int x = 0; x < d; x++ ) // column - x
                 {
-                    if (x == (d-2)) board[y][x] = 2;
-                    if (x == (d-3)) board[y][x] = 1;
+                    board[y][x]=d*d-k;
+                    if ((d*d)%2 == 0 && y == (d-1))
+                    {
+                        if (x == (d-2)) board[y][x] = 2;
+                        if (x == (d-3)) board[y][x] = 1;
+                    }
+                    k++;
                 }
-                k++;
             }
         }
     }
