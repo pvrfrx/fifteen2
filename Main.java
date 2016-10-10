@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 
 public class Main {
     // constants
-    final static int DIM_MIN = 3;
-    final static int DIM_MAX = 9;
+    final static private int DIM_MIN = 3;
+    final static private int DIM_MAX = 9;
 
     // board
     static int[][] board;
@@ -127,14 +127,14 @@ public class Main {
             e.printStackTrace();
         }
         // success
-        return;//return 0;
+       // return;//return 0;
     }
 
 /**
  * Initializes the game's board with tiles numbered 1 through d*d - 1
  * (i.e., fills 2D array with values but does not actually print them).
  */
-    static void init() {
+    static private void init() {
         int k = 1;
         if (d==2){
             board[0][0] = 2;
@@ -142,7 +142,7 @@ public class Main {
             board[0][1] = 3;
             board[1][1] = 0;
         }
-      /*  else if (d==3){
+     /*   else if (d==3){
             board[0][0] = 0;
             board[1][0] = 1;
             board[2][0] = 7;
@@ -172,7 +172,7 @@ public class Main {
 /**
  * Clears screen using ANSI escape sequences.
  */
-    static void clear() {
+    static private void clear() {
         for (int i = 0; i < 100; i++) {
             System.out.println();
         }
@@ -183,7 +183,7 @@ public class Main {
 /**
  * Greets player.
  */
-    static void greet() {
+    static private void greet() {
         clear();
         System.out.println("WELCOME TO GAME OF FIFTEEN");
         try {
@@ -230,7 +230,7 @@ public class Main {
  * returns false.
  */
     static int[][] move(int tile, int[][] board){
-        int[][] result = new int[d][d];
+        int[][] result = new int[d][d];//*board.clone();*/
         for (int i = 0; i < d; i++) {
             for (int j = 0; j < d; j++) {
                 result[i][j] = board[i][j];
@@ -260,7 +260,7 @@ public class Main {
  * Returns true if game is won (i.e., board is in winning configuration),
  * else false.
  */
-    static boolean won(){
+    static private boolean won(){
         int counter = 0;
         for(int y = 0; y < d; y++) //row - y
         {
@@ -276,7 +276,7 @@ public class Main {
         return true;
     }
 
-    static int GetInt(){
+    static private int GetInt(){
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
             return Integer.parseInt(reader.readLine());

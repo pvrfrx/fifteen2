@@ -3,17 +3,14 @@ package com.company;
 import java.util.ArrayList;
 
 public class AStar {
+
     private ArrayList<State> openList = new ArrayList<>();
     private ArrayList<State> closeList = new ArrayList<>();
     private State startPosition;
     private State currentPosition;
     private boolean win = false;
 
-    public State getStartPosition() {
-        return this.startPosition;
-    }
-
-    public void addInOpenList(State state){
+    private void addInOpenList(State state){
         this.openList.add(state);
     }
 
@@ -21,10 +18,9 @@ public class AStar {
         this.startPosition = position;
         this.currentPosition = position;
         this.addInOpenList(position);
-
     }
 
-    public boolean checkStateInList(State stateTo, ArrayList<State> list){
+    private boolean checkStateInList(State stateTo, ArrayList<State> list){
         boolean result = false;
         for (State stateOn :
                 list) {
@@ -32,7 +28,8 @@ public class AStar {
         }
         return result;
     }
-    public ArrayList<State> findNeighbors(State state) throws NullPointerException{
+
+    public ArrayList<State> findNeighbors(State state){
         ArrayList<State> result = new ArrayList<>();
         ArrayList<Integer> possibleStep = state.findPossibleStep();
         for (int i :
@@ -48,18 +45,38 @@ public class AStar {
         return result;
     }
 
-    public void putOnOpenList(State state) throws NullPointerException{
+    public void putOnOpenList(State state){
+        if (!checkStateInList(state, this.openList)) {
+            this.openList.add(findPlaceInOpenList(state),state);
+        }
 
-            if (!checkStateInList(state, this.openList)) this.openList.add(state);
-            //Если клетка уже в открытом списке, то проверяем, не дешевле ли будет путь через эту клетку.
-            // Для сравнения используем стоимость G. Более низкая стоимость G указывает на то, что путь будет дешевле.
-            // Эсли это так, то меняем родителя клетки на текущую клетку и пересчитываем для нее стоимости G и F.
-            // Если вы сортируете открытый список по стоимости F, то вам надо отсортировать свесь список в соответствии с изменениями.
-            else if (state.getG()>(this.currentPosition.getG()+1)){
-                state.setParent(this.currentPosition);
-                System.out.println("йохохуу"); //if (state.checkLength()) state.changeParent();
-                //throw new NullPointerException();
-            }
+        else if (state.getG()>(this.currentPosition.getG()+1)){
+            state.setParent(this.currentPosition);
+            state.setG(this.currentPosition.getG()+1);
+        }
+    }
+    int findPlaceInOpenList(State state){
+        return searchIndex(this.openList, state, 0, this.openList.size());
+    }
+    int searchIndex(ArrayList<State> states, State state, int start, int end)
+    {
+        int result = end;
+        int middle = (start+end)/2;
+        if(middle >= end) return end;
+        else if(state.getF()<states.get(middle).getF())
+        {
+            result = searchIndex(states, state, start, middle);
+            if(result!=middle) return result;
+            else return middle;
+        }
+        else if(state.getF()>=states.get(middle).getF())
+        {
+            result = searchIndex(states, state,  middle+1, end);
+            if(result!=end) return result;
+            else return end;
+        }
+        return result;
+    //    else return middle;
     }
 
     public void fromOpenToCloseList(State state){
@@ -91,42 +108,40 @@ public class AStar {
     }
 
     public State findCurrentPosition(){
-        int min = Integer.MAX_VALUE;
+        /*int min = Integer.MAX_VALUE;
         State result = new State();
         for (State state :
                 this.openList) {
-        /*    if (state.parent == null && startPosition.equals(currentPosition)){
-                return startPosition;
-            }
-            else if (state.parent.equals(this.currentPosition)){*/
                 if (state.getF() < min) {
                     result = state;
                     min = state.getF();
                 }
-           // }
         }
         if (min == Integer.MAX_VALUE) return null;
         else {
             this.setCurrentPosition(result);
             return result;
-        }
+        }*/
+        State result = this.openList.get(0);
+        this.setCurrentPosition(result);
+        return result;
     }
 
-    public void setCurrentPosition(State currentPosition) {
+    private void setCurrentPosition(State currentPosition) {
         this.currentPosition = currentPosition;
     }
 
     public void printCurrentPosition(){
         System.out.println();
-        System.out.println("!!!Это текущая позиция!!!");
+        System.out.println("!!!Это текущая позиция. G = "+this.currentPosition.getG()+". H = "+this.currentPosition.getH()+". F = "+this.currentPosition.getF());
         this.currentPosition.printState();
         System.out.println();
     }
 
     public boolean win(){
-        if (win == true) return true;
-        if (currentPosition.getH() == 0) return true;
-        return false;
+        if (win) return true;
+        else if (currentPosition.getH() == 0) return true;
+        else return false;
     }
 
     public boolean lose(){
@@ -135,13 +150,13 @@ public class AStar {
 
     static public class State {
         private int[][] currentState;
-        private int g; //расстояние от начальной вершины до текущей
-        private int h; //эвристическое предположение о расстоянии от текущей вершины, до терминальной
-       // private int f; //вес вершины
+        private int g;
+        private int h;
         private State parent;
-        public State(){
 
+        public State(){
         }
+
         public State(int[][] currentState, int g){
             this.currentState = currentState.clone();
             this.setG(g);
@@ -190,16 +205,11 @@ public class AStar {
             this.h = h;
         }
 
-        public State getParent() {
-            return parent;
-        }
-
         public void setParent(State parent) {
             this.parent = parent;
         }
 
         public boolean equals(State obj) {
-            //return this.currentState.equals(obj.currentState);
             int y = 0;
             int x = 0;
             for (int[] i :
@@ -215,7 +225,7 @@ public class AStar {
             return true;
         }
 
-        public ArrayList<Integer> findPossibleStep() throws NullPointerException{
+        public ArrayList<Integer> findPossibleStep(){
             ArrayList<Integer> result = new ArrayList<>();
             int[] yxZeroElement = Main.findXYElement(0, this.currentState);
             int yZeroElement = yxZeroElement[0];
@@ -275,10 +285,6 @@ public class AStar {
 
         public void printState(){
             Main.draw(this.currentState);
-        }
-
-        public boolean checkLength(){
-            return true;
         }
     }
 }
