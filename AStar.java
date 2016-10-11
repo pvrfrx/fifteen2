@@ -14,6 +14,10 @@ public class AStar {
         this.openList.add(state);
     }
 
+    public State getCurrentPosition() {
+        return currentPosition;
+    }
+
     public AStar(State position){
         this.startPosition = position;
         this.currentPosition = position;
@@ -82,6 +86,12 @@ public class AStar {
     public void fromOpenToCloseList(State state){
         closeList.add(state);
         openList.remove(state);
+    }
+
+    public void setNewCurrentPosition(){
+        this.setCurrentPosition(this.openList.get(0));
+        this.openList.remove(0);
+        this.closeList.add(this.currentPosition);
     }
 
     public void printAStar(){

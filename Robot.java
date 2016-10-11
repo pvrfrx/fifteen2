@@ -13,23 +13,25 @@ public class Robot {
         int count = 0;
         System.out.println("Старт = " + new Date());
         while (true) {
-            State currentPosition = aStar.findCurrentPosition();
-            aStar.fromOpenToCloseList(currentPosition);
+          //  State currentPosition = aStar.findCurrentPosition();
+          //  aStar.fromOpenToCloseList(currentPosition);
+            aStar.setNewCurrentPosition();
          //   aStar.printCurrentPosition();
+
             ArrayList<State> neighbors = null;
-            neighbors = aStar.findNeighbors(currentPosition);
+            neighbors = aStar.findNeighbors(aStar.getCurrentPosition());
             for (State neighbor :
                     neighbors) {
                 aStar.putOnOpenList(neighbor);
             }
-        //  aStar.printAStar();
+       //  aStar.printAStar();
             if (aStar.win()) {
                 System.out.println("WIN");
                 System.out.println("Количество ходов - "+ (count+1));
                 break;
             }
             else if (aStar.lose()){
-                System.out.println("LOSE");
+                System.out.println("LOSE. Количество ходов=" + count);
                 break;
             }
             else if (count >= 2100000) {
@@ -37,7 +39,7 @@ public class Robot {
                 break;
             }
             else count++;
-            if (count%1000 == 0 && count!=0) System.out.println(count);
+            if (count%10000 == 0 && count!=0) System.out.println("Количество ходов=" + count+ ". Время= " + new Date());
        }
        System.out.println("Финиш = " + new Date());
     }
